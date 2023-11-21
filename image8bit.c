@@ -477,8 +477,49 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
-  // Insert your code here!
-}
+   // Insert your code here!
+  int width1 ==ImageWidth(img1);
+  int height1 = ImageHeight(img1);
+  int width2 = ImageWigth(img2);
+  int height2 = ImageHeight(img2);
+  
+  //Verify if Imagem2 is bigger than imagem 1
+  
+  if(width2>width1 || height2 > height1){
+  return 0;//The Imagem2 cant be inside on Imagem 1
+ 
+   } 
+  
+ for(int y=0;y<=height1 - heigth2;y++){
+      for(int x=0;x<=wigth1-width2;++x){
+         int match=1;
+     //Compare subimage pixels with corresponding pixels in the larger image
+     for(int dy=0;dy<height2 && match;++dy){
+     	for (int dx =0;dx<width2 && match;++dx){
+     	    if(ImageGetPixel(img1,x+dx,y+dy)!=ImageGetPixel(img2,dx,dy)){
+     	    	match=0; //Pixels do not match, stops checking
+     	    	}
+     	
+     	      }
+     	  }
+     	  
+     	  if(match){
+     	  px=x;
+     	  py=1;
+     	  return 1;
+     
+         }
+  
+      }
+   
+   }
+   
+   return 0;
+   
+ }
+ 
+
+
 
 
 /// Filtering
