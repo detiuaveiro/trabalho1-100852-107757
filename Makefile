@@ -5,7 +5,7 @@
 # make clean        # to cleanup object files and executables
 # make cleanobj     # to cleanup object files only
 
-CFLAGS = -Wall -O2 -g
+CFLAGS = -Wall -O2 -g 
 
 PROGS = imageTool imageTest
 
@@ -72,6 +72,10 @@ test8: $(PROGS) setup
 test9: $(PROGS) setup
 	./imageTool test/original.pgm blur 7,7 save blur.pgm
 	cmp blur.pgm test/blur.pgm
+
+test10: $(PROGS) setup
+	./imageTool test/original.pgm bri .0 save bri.pgm
+	cmp bri.pgm test/bri.pgm
 
 .PHONY: tests
 tests: $(TESTS)
