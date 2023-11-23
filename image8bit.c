@@ -608,7 +608,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
       // Blend pixel values from img2 to img1 at the specified position
       uint8 pixelValue1 = ImageGetPixel(img1, x + i, y + j);
       uint8 pixelValue2 = ImageGetPixel(img2, i, j);
-      int blendedValue = (int)(alpha * pixelValue2 + (1 - alpha) * pixelValue1);
+      int blendedValue = (int)(alpha * pixelValue2 + (1 - alpha) * pixelValue1 + 0.5);  // Round to nearest integer
 
       // Saturate the result to stay within the valid range [0, PixMax]
       if (blendedValue < 0) {
