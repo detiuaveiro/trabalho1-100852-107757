@@ -10,11 +10,11 @@
 /// 2013, 2023
 
 // Student authors (fill in below):
-// NMec:  Name:
+// NMec:100852  Name: Reginaldo Rita 
+// NMec:107757  Name: Ivo Deldago
 // 
 // 
-// 
-// Date:
+// Date: November 2023
 //
 
 #include "image8bit.h"
@@ -27,8 +27,9 @@
 #include "instrumentation.h"
 
 
+// Extra:
 #include <string.h>
-#include <math.h>
+
 // The data structure
 //
 // An image is stored in a structure containing 3 fields:
@@ -177,15 +178,15 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   // Insert your code here!
 
   // Allocate memory for the image structure
-  Image img = (Image)malloc(sizeof(struct image));
-  if (img == NULL) {
-    errno = ENOMEM;
+  Image img = (Image)malloc(sizeof(struct image));  
+  if (img == NULL) {  
+    errno = ENOMEM;  
     return NULL;
   }
 
   // Initialize the image structure
-  img->width = width;
-  img->height = height;
+  img->width = width;              
+  img->height = height;           
   img->maxval = maxval;
 
   // Allocate memory for the pixel data
@@ -392,7 +393,7 @@ static inline int G(Image img, int x, int y) {
   assert (y >= 0 && y < img->height);
   
   // Calculate linear pixel index
-  index = y * img->width + x;
+  index = y * img -> width + x;
 
   //
   assert (0 <= index && index < img->width*img->height);
@@ -443,7 +444,7 @@ void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
   // Insert your code here!
 
-  for (int i = 0; i < img->width * img->height; ++i) {
+  for (int i = 0; i < img->width * img->height; ++i) {  
     img->pixel[i] = (img->pixel[i] < thr) ? 0 : PixMax;
   }
 }
@@ -458,7 +459,7 @@ void ImageBrighten(Image img, double factor) { ///
   // Insert your code here!
 
   for (int i = 0; i < img->width * img->height; ++i) {
-    int newPixelValue = (int)(img->pixel[i] * factor);
+    int newPixelValue = (int)(img->pixel[i] * factor + 0.5);  // Round to nearest integer
     img->pixel[i] = (newPixelValue > PixMax) ? PixMax : (uint8)newPixelValue;
   }
 }
@@ -560,8 +561,8 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   for (int j = 0; j < h; ++j) {
     for (int i = 0; i < w; ++i) {
       // Copy pixel values from the original image to the cropped image
-      uint8 pixelValue = ImageGetPixel(img, x + i, y + j);
-      ImageSetPixel(croppedImg, i, j, pixelValue);
+      uint8 pixelValue = ImageGetPixel(img, x + i, y + j);  
+      ImageSetPixel(croppedImg, i, j, pixelValue);  
     }
   }
 
@@ -640,7 +641,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
       uint8 pixelValue2 = ImageGetPixel(img2, i, j);
 
       if (pixelValue1 != pixelValue2) {
-        return 0;  // Pixel mismatch, no match
+        return 0;  // Pixels mismatch, no subimage found
       }
     }
   }
@@ -659,7 +660,7 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 
   for (int j = 0; j <= img1->height - img2->height; ++j) {
     for (int i = 0; i <= img1->width - img2->width; ++i) {
-      if (ImageMatchSubImage(img1, i, j, img2)) {
+      if (ImageMatchSubImage(img1, i, j, img2)) {  
         // Match found, update px and py and return 1
         if (px != NULL) {
           *px = i;
@@ -689,7 +690,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
   assert(img != NULL);
   assert(dx >= 0 && dy >= 0);
 
-  int kernelSize = (2 * dx + 1) * (2 * dy + 1);
+  int kernelSize = (2 * dx + 1) * (2 * dy + 1); // Size of the kernel (number of pixels) 
 
   for (int y = 0; y < img->height; ++y) {
     for (int x = 0; x < img->width; ++x) {
