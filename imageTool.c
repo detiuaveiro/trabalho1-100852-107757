@@ -98,7 +98,7 @@ int main(int ac, char* av[]) {
 
   // The image buffer
   const int N = 10;   // buffer capacity
-  Image img[N];     // the images
+  Image img[N];       // the images
   int n = 0;          // number of images created
 
   int k = 1;

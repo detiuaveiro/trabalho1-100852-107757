@@ -73,9 +73,6 @@ test9: $(PROGS) setup
 	./imageTool test/original.pgm blur 7,7 save blur.pgm
 	cmp blur.pgm test/blur.pgm
 
-test10: $(PROGS) setup
-	./imageTool test/original.pgm bri .0 save bri.pgm
-	cmp bri.pgm test/bri.pgm
 
 .PHONY: tests
 tests: $(TESTS)

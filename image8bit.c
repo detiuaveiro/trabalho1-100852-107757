@@ -26,9 +26,8 @@
 #include <stdlib.h>
 #include "instrumentation.h"
 
-
-// Extra:
 #include <string.h>
+
 
 // The data structure
 //
@@ -151,12 +150,16 @@ void ImageInit(void) { ///
   InstrCalibrate();
   InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
   // Name other counters here...
-  
+  InstrName[1] = "comparasions";
 }
 
 // Macros to simplify accessing instrumentation counters:
-#define PIXMEM InstrCount[0]
+#define PIXMEM InstrCount[0]    
 // Add more macros here...
+#define COMPARASIONS InstrCount[1]
+
+
+
 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
 
@@ -640,6 +643,8 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
       uint8 pixelValue1 = ImageGetPixel(img1, x + i, y + j);
       uint8 pixelValue2 = ImageGetPixel(img2, i, j);
 
+      COMPARASIONS++;  // Count the number of pixel comparasions
+
       if (pixelValue1 != pixelValue2) {
         return 0;  // Pixels mismatch, no subimage found
       }
@@ -648,6 +653,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 
   return 1;  // All pixels match, subimage found
 }
+
 
 /// Locate a subimage inside another image.
 /// Searches for img2 inside img1.
@@ -659,14 +665,14 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   // Insert your code here!
 
   for (int j = 0; j <= img1->height - img2->height; ++j) {
-    for (int i = 0; i <= img1->width - img2->width; ++i) {
+    for (int i = 0; i <= img1->width - img2->width; ++i) {  
       if (ImageMatchSubImage(img1, i, j, img2)) {  
         // Match found, update px and py and return 1
         if (px != NULL) {
           *px = i;
         }
         if (py != NULL) {
-          *py = j;
+          *py = j; 
         }
         return 1;
       }
@@ -681,36 +687,53 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 
 /// Blur an image by a applying a (2dx+1)x(2dy+1) mean filter.
 /// Each pixel is substituted by the mean of the pixels in the rectangle
-/// [x-dx, x+dx]x[y-dy, y+dy].
-/// The image is changed in-place.
+/// [x-dx, x+dx]x[y-dy, y+dy] 
+/// The image is changed in-place.  
 void ImageBlur(Image img, int dx, int dy) { ///
   // Insert your code here!
-
-
   assert(img != NULL);
   assert(dx >= 0 && dy >= 0);
 
-  int kernelSize = (2 * dx + 1) * (2 * dy + 1); // Size of the kernel (number of pixels) 
+  int width = img->width;
+  int height = img->height;
 
-  for (int y = 0; y < img->height; ++y) {
-    for (int x = 0; x < img->width; ++x) {
+  // Create a temporary image to store the blurred result
+  Image tempImg = ImageCreate(width, height, img -> maxval);
+  assert(tempImg != NULL);
+
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
       int sum = 0;
+      int count = 0;
 
-      for (int j = -dy; j <= dy; ++j) {
-        for (int i = -dx; i <= dx; ++i) {
-          int nx = x + i;
-          int ny = y + j;
-
-          // Ensure (nx, ny) is a valid position
-          if (nx >= 0 && nx < img->width && ny >= 0 && ny < img->height) {
-            sum += ImageGetPixel(img, nx, ny);
+      // Calculate the mean value of pixels in the neighborhood
+      for (int j = y - dy; j <= y + dy; ++j) {
+        for (int i = x - dx; i <= x + dx; ++i) {
+          if (i >= 0 && i < width && j >= 0 && j < height) {
+            sum += ImageGetPixel(img, i, j);
+            count++;
           }
         }
       }
 
-      // Set the pixel value to the mean of the surrounding pixels
-      ImageSetPixel(img, x, y, (uint8)(sum / kernelSize));
+       // Calculate the mean value and round it to the nearest integer
+      uint8 meanValue = (uint8)((sum + count / 2) / count);  // Round to nearest integer
+
+      // Set the rounded mean value to the corresponding pixel in the temporary image
+      ImageSetPixel(tempImg, x, y, meanValue);
     }
   }
+  
+
+  // Copy the blurred result from the temporary image to the original image
+  for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x) {
+      uint8 pixelValue = ImageGetPixel(tempImg, x, y) ;
+      ImageSetPixel(img, x, y, pixelValue);
+    }
+  }
+
+  // Destroy the temporary image
+  ImageDestroy(&tempImg);
 }
 
