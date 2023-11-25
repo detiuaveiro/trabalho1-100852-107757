@@ -688,7 +688,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
     int height = ImageHeight(img);
     //Criar uma copia da original para guardar resultados da desfocagem.
     Image imgCopy = ImageCreate(width,height,ImageMaxval(img));
-    ImageSave(imgCopy,img);
+
 
     for(int y=0;y<height;++y){
         for (int x=0;x<width;++x){
