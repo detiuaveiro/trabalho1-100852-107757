@@ -684,7 +684,37 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) { ///
-  // Insert your code here!
+    int width = ImageWidth(img);
+    int height = ImageHeight(img);
+    //Criar uma copia da original para guardar resultados da desfocagem.
+    Image imgCopy = ImageCreate(width,height,ImageMaxval(img));
+    ImageSave(imgCopy,img);
+
+    for(int y=0;y<height;++y){
+        for (int x=0;x<width;++x){
+            int sum =0;
+            int count =0;
+            //Calcular a media dos pixeles
+            for(int j=-dy;j<=dy;++j){
+                for(int i = -dx;i<=dx;++i){
+                    int nx = x+i;
+                    int ny = y+j;
+
+                    if(nx>=0 && nx<width && ny>=0 && ny<height){
+                        sum += ImageGetPixel(imgCopy,nx,ny);
+                        ++count;
+                    }
+                }
+            }
+            //Calcular a media e definir novo valor
+            if(count>0){
+                uint8 average = (uint8)(sum/count);
+                ImageSetPixel(img,x,y,average);
+            }
+        }
+        ImageDestroy(&imgCopy);
+    }
+
 
 
   assert(img != NULL);
