@@ -150,13 +150,16 @@ void ImageInit(void) { ///
   InstrCalibrate();
   InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
   // Name other counters here...
-  InstrName[1] = "comparasions";
+  InstrName[1] = "comparisons";
+  InstrName[2] = "operations";
 }
 
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]    
 // Add more macros here...
-#define COMPARASIONS InstrCount[1]
+#define COMPARISONS InstrCount[1]
+
+#define OPERATIONS InstrCount[2]
 
 
 
@@ -640,10 +643,10 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 
   for (int j = 0; j < img2->height; ++j) {
     for (int i = 0; i < img2->width; ++i) {
-      uint8 pixelValue1 = ImageGetPixel(img1, x + i, y + j);
-      uint8 pixelValue2 = ImageGetPixel(img2, i, j);
+      uint8 pixelValue1 = ImageGetPixel(img1, x + i, y + j);  // Get pixel value from img1
+      uint8 pixelValue2 = ImageGetPixel(img2, i, j);          // Get pixel value from img2
 
-      COMPARASIONS++;  // Count the number of pixel comparasions
+      COMPARISONS++;  // Count the number of pixel comparasions
 
       if (pixelValue1 != pixelValue2) {
         return 0;  // Pixels mismatch, no subimage found
@@ -696,7 +699,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
 
   int width = img->width;
   int height = img->height;
-
+  
   // Create a temporary image to store the blurred result
   Image tempImg = ImageCreate(width, height, img -> maxval);
   assert(tempImg != NULL);
@@ -705,35 +708,35 @@ void ImageBlur(Image img, int dx, int dy) { ///
     for (int x = 0; x < width; ++x) {
       int sum = 0;
       int count = 0;
-
       // Calculate the mean value of pixels in the neighborhood
       for (int j = y - dy; j <= y + dy; ++j) {
         for (int i = x - dx; i <= x + dx; ++i) {
           if (i >= 0 && i < width && j >= 0 && j < height) {
             sum += ImageGetPixel(img, i, j);
             count++;
+            // Count the number of operations
+            OPERATIONS+=2;
           }
         }
       }
-
        // Calculate the mean value and round it to the nearest integer
       uint8 meanValue = (uint8)((sum + count / 2) / count);  // Round to nearest integer
-
       // Set the rounded mean value to the corresponding pixel in the temporary image
       ImageSetPixel(tempImg, x, y, meanValue);
     }
   }
-  
-
   // Copy the blurred result from the temporary image to the original image
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       uint8 pixelValue = ImageGetPixel(tempImg, x, y) ;
       ImageSetPixel(img, x, y, pixelValue);
+
+      // Count the number of operations
+      OPERATIONS+=2;
     }
   }
-
   // Destroy the temporary image
   ImageDestroy(&tempImg);
 }
+
 
